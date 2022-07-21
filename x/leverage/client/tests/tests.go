@@ -260,20 +260,23 @@ func (s *IntegrationTestSuite) TestLeverageScenario() {
 				Registry: []types.Token{
 					{
 						// must match app/test_helpers.go/IntegrationTestNetworkConfig
-						BaseDenom:            umeeapp.BondDenom,
-						SymbolDenom:          umeeapp.DisplayDenom,
-						Exponent:             6,
-						ReserveFactor:        sdk.MustNewDecFromStr("0.1"),
-						CollateralWeight:     sdk.MustNewDecFromStr("0.05"),
-						LiquidationThreshold: sdk.MustNewDecFromStr("0.05"),
-						BaseBorrowRate:       sdk.MustNewDecFromStr("0.02"),
-						KinkBorrowRate:       sdk.MustNewDecFromStr("0.2"),
-						MaxBorrowRate:        sdk.MustNewDecFromStr("1.5"),
-						KinkUtilization:      sdk.MustNewDecFromStr("0.2"),
-						LiquidationIncentive: sdk.MustNewDecFromStr("0.18"),
-						EnableMsgSupply:      true,
-						EnableMsgBorrow:      true,
-						Blacklist:            false,
+						BaseDenom:              umeeapp.BondDenom,
+						SymbolDenom:            umeeapp.DisplayDenom,
+						Exponent:               6,
+						ReserveFactor:          sdk.MustNewDecFromStr("0.1"),
+						CollateralWeight:       sdk.MustNewDecFromStr("0.05"),
+						LiquidationThreshold:   sdk.MustNewDecFromStr("0.05"),
+						BaseBorrowRate:         sdk.MustNewDecFromStr("0.02"),
+						KinkBorrowRate:         sdk.MustNewDecFromStr("0.2"),
+						MaxBorrowRate:          sdk.MustNewDecFromStr("1.5"),
+						KinkUtilization:        sdk.MustNewDecFromStr("0.2"),
+						LiquidationIncentive:   sdk.MustNewDecFromStr("0.18"),
+						EnableMsgSupply:        true,
+						EnableMsgBorrow:        true,
+						Blacklist:              false,
+						MaxCollateralShare:     sdk.MustNewDecFromStr("1"),
+						MaxSupplyUtilization:   sdk.MustNewDecFromStr("1"),
+						MinCollateralLiquidity: sdk.MustNewDecFromStr("0"),
 					},
 				},
 			},
@@ -310,9 +313,8 @@ func (s *IntegrationTestSuite) TestLeverageScenario() {
 			},
 			false,
 			&types.QuerySupplyAPYResponse{},
-			// Borrow rate * (1 - ReserveFactor - OracleRewardFactor)
-			// 1.50 * (1 - 0.10 - 0.01) = 0.89 * 1.5 = 1.335
-			&types.QuerySupplyAPYResponse{APY: sdk.MustNewDecFromStr("1.335")},
+			// Supply utilization is zero, so supply APY is 0%
+			&types.QuerySupplyAPYResponse{APY: sdk.MustNewDecFromStr("0")},
 		},
 		testQuery{
 			"query borrow APY",
@@ -322,10 +324,8 @@ func (s *IntegrationTestSuite) TestLeverageScenario() {
 			},
 			false,
 			&types.QueryBorrowAPYResponse{},
-			// This is an edge case technically - when effective supply, meaning
-			// module balance + total borrows, is zero, utilization (0/0) is
-			// interpreted as 100% so max borrow rate (150% APY) is used.
-			&types.QueryBorrowAPYResponse{APY: sdk.MustNewDecFromStr("1.50")},
+			// Supply utilization is 0% so base borrow rate (2% APY) is used.
+			&types.QueryBorrowAPYResponse{APY: sdk.MustNewDecFromStr("0.02")},
 		},
 	}
 
