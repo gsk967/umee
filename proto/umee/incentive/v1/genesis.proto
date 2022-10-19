@@ -1,7 +1,7 @@
 syntax = "proto3";
 package umeenetwork.umee.incentive.v1;
 
-option go_package = "github.com/umee-network/umee/v2/x/incentive/types";
+option go_package = "github.com/umee-network/umee/v3/x/incentive/types";
 
 import "cosmos/base/v1beta1/coin.proto";
 import "umee/incentive/v1/incentive.proto";
@@ -19,7 +19,7 @@ message GenesisState {
   repeated LockAmount        locked_amounts      = 5 [(gogoproto.nullable) = false];
   repeated RewardBasis       reward_bases        = 6 [(gogoproto.nullable) = false];
   repeated RewardAccumulator reward_accumulators = 7 [(gogoproto.nullable) = false];
-  repeated Unlocking         unlockings          = 8 [(gogoproto.nullable) = false];
+  repeated Unbonding         unbondings          = 8 [(gogoproto.nullable) = false];
 }
 
 // LockAmount tracks the amount of coins of one token denomination locked by a single address.
@@ -32,7 +32,7 @@ message LockAmount {
 // at the last time a specific address calculated pending rewards for it.
 message RewardBasis {
   string   address                                  = 1;
-  string   locked_denom                               = 2;
+  string   locked_denom                             = 2;
   repeated cosmos.base.v1beta1.DecCoin reward_basis = 3 [
     (gogoproto.nullable)     = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins"
@@ -43,7 +43,7 @@ message RewardBasis {
 // of rewards that a single unit of locked_denom would have accumulated if it was
 // locked since genesis.
 message RewardAccumulator {
-  string   locked_denom                               = 1;
+  string   locked_denom                             = 1;
   repeated cosmos.base.v1beta1.DecCoin reward_basis = 2 [
     (gogoproto.nullable)     = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins"

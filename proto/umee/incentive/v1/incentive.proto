@@ -1,14 +1,13 @@
 syntax = "proto3";
 package umeenetwork.umee.incentive.v1;
 
+import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/umee-network/umee/v2/x/incentive/types";
+option go_package = "github.com/umee-network/umee/v3/x/incentive/types";
 
 // Params defines the parameters for the incentive module.
 message Params {
-  option (gogoproto.goproto_stringer) = false;
-
   // Max_unbondings defines the maximum amount of concurrent unbondings an address can have.
   uint32 max_unbondings = 1 [(gogoproto.moretags) = "yaml:\"max_unbondings\""];
 
@@ -19,8 +18,6 @@ message Params {
 // IncentiveProgram defines a liquidity mining program on a single
 // token that will run for a set amount of time.
 message IncentiveProgram {
-  option (gogoproto.equal) = true;
-
   // ID uniquely identifies the incentive program after it has been created.
   // Incentive programs not yet passed by governance have an ID of zero.
   uint32 id = 1;
