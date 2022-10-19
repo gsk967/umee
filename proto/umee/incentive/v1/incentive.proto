@@ -1,0 +1,41 @@
+syntax = "proto3";
+package umeenetwork.umee.incentive.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/umee-network/umee/v2/x/incentive/types";
+
+// Params defines the parameters for the incentive module.
+message Params {
+  option (gogoproto.goproto_stringer) = false;
+
+  // Max_unbondings defines the maximum amount of concurrent unbondings an address can have.
+  uint32 max_unbondings = 1 [(gogoproto.moretags) = "yaml:\"max_unbondings\""];
+
+  // Unbonding_period defines the duration in blocks which tokens are locked.
+  uint64 unbonding_period = 2 [(gogoproto.moretags) = "yaml:\"unbonding_period\""];
+}
+
+// IncentiveProgram defines a liquidity mining program on a single
+// token that will run for a set amount of time.
+message IncentiveProgram {
+  option (gogoproto.equal) = true;
+
+  // ID uniquely identifies the incentive program after it has been created.
+  // Incentive programs not yet passed by governance have an ID of zero.
+  uint32 id = 1;
+
+  // Supply_denom defines the incentivized token. Users who supply and lock
+  // the uToken associated with this base token are eligible for rewards.
+  string supply_denom = 2 [(gogoproto.moretags) = "yaml:\"supply_denom\""];
+
+  // Total_incentive tracks the remaining reward tokens in an incentive program.
+  // Incentive programs not yet passed by governance display proposed rewards over their duration.
+  cosmos.base.v1beta1.Coin total_incentive = 3 [(gogoproto.nullable) = false];
+
+  // Start_height is the block height at which the incentive program begins.
+  uint64 start_height = 4 [(gogoproto.moretags) = "yaml:\"start_date\""];
+
+  // Duration is the length of the incentive program in blocks.
+  uint64 duration = 5;
+}

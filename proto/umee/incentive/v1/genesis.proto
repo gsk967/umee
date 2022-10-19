@@ -1,0 +1,58 @@
+syntax = "proto3";
+package umeenetwork.umee.incentive.v1;
+
+option go_package = "github.com/umee-network/umee/v2/x/incentive/types";
+
+import "cosmos/base/v1beta1/coin.proto";
+import "umee/incentive/v1/incentive.proto";
+import "gogoproto/gogo.proto";
+
+// GenesisState defines the x/incentive module's genesis state.
+message GenesisState {
+  Params                    params               = 1 [(gogoproto.nullable) = false];
+  repeated IncentiveProgram programs             = 2 [(gogoproto.nullable) = false];
+  uint32                    next_id              = 3;
+  repeated cosmos.base.v1beta1.Coin total_locked = 4 [
+    (gogoproto.nullable)     = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  repeated LockAmount        locked_amounts      = 5 [(gogoproto.nullable) = false];
+  repeated RewardBasis       reward_bases        = 6 [(gogoproto.nullable) = false];
+  repeated RewardAccumulator reward_accumulators = 7 [(gogoproto.nullable) = false];
+  repeated Unlocking         unlockings          = 8 [(gogoproto.nullable) = false];
+}
+
+// LockAmount tracks the amount of coins of one token denomination locked by a single address.
+message LockAmount {
+  string                   address = 1;
+  cosmos.base.v1beta1.Coin amount  = 2 [(gogoproto.nullable) = false];
+}
+
+// RewardBasis tracks the value of a given locked denom's RewardAccumulator
+// at the last time a specific address calculated pending rewards for it.
+message RewardBasis {
+  string   address                                  = 1;
+  string   locked_denom                               = 2;
+  repeated cosmos.base.v1beta1.DecCoin reward_basis = 3 [
+    (gogoproto.nullable)     = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins"
+  ];
+}
+
+// RewardAccumulator is a global reward tracking struct that indicates the amount
+// of rewards that a single unit of locked_denom would have accumulated if it was
+// locked since genesis.
+message RewardAccumulator {
+  string   locked_denom                               = 1;
+  repeated cosmos.base.v1beta1.DecCoin reward_basis = 2 [
+    (gogoproto.nullable)     = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins"
+  ];
+}
+
+// Unbonding is a structure that tracks an in-progress token unbonding.
+message Unbonding {
+  string                   address = 1;
+  uint64                   end     = 2;
+  cosmos.base.v1beta1.Coin amount  = 3 [(gogoproto.nullable) = false];
+}
