@@ -49,5 +49,24 @@ func (k Keeper) ModuleBalance(ctx sdk.Context, denom string) sdk.Coin {
 
 // Claim claims any pending rewards belonging to an address.
 func (k Keeper) Claim(ctx sdk.Context, addr sdk.AccAddress) (sdk.Coins, error) {
-	return sdk.Coins{}, incentive.ErrNotImplemented
+	// calculate and set pending rewards available to account at the current block
+	if err := k.AllocatePendingRewards(ctx, addr); err != nil {
+		return sdk.Coins{}, err
+	}
+
+	// get the sum of newly calculated and previously pending rewards
+	rewards := k.GetAllPendingRewards(ctx, addr)
+
+	// claim all pending rewards
+	if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, incentive.ModuleName, addr, rewards); err != nil {
+		return sdk.Coins{}, err
+	}
+
+	// set pending rewards to zero
+	if err := k.SetPendingRewards(ctx, addr, sdk.NewCoins()); err != nil {
+		return sdk.Coins{}, err
+	}
+
+	// returns the amount received
+	return rewards, nil
 }
