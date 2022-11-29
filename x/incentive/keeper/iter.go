@@ -7,9 +7,9 @@ import (
 	"github.com/umee-network/umee/v3/x/incentive"
 )
 
-// GetAllPendingRewards returns an sdk.Coins object containing all pending rewards
+// GetPendingRewards returns an sdk.Coins object containing all pending rewards
 // associated with an address.
-func (k Keeper) GetAllPendingRewards(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins {
+func (k Keeper) GetPendingRewards(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins {
 	kvStore := ctx.KVStore(k.storeKey)
 	prefix := incentive.CreatePendingRewardKeyNoDenom(addr)
 	pendingReward := sdk.NewCoins()
@@ -28,5 +28,29 @@ func (k Keeper) GetAllPendingRewards(ctx sdk.Context, addr sdk.AccAddress) sdk.C
 
 	store.Iterate(kvStore, ctx, prefix, iterator)
 
-	return sdk.NewCoins()
+	return pendingReward
+}
+
+// GetRewardBasis returns an sdk.Coins object containing the reward basis associated with
+// a given address and lock denom.
+func (k Keeper) GetRewardBasis(ctx sdk.Context, addr sdk.AccAddress, lockDenom string) sdk.DecCoins {
+	kvStore := ctx.KVStore(k.storeKey)
+	prefix := incentive.CreateRewardBasisKeyNoRewardDenom(addr, lockDenom)
+	rewardBasis := sdk.NewDecCoins()
+
+	iterator := func(key, val []byte) error {
+		// get reward denom from key
+		denom := store.TrailingDenomFromKey(key, prefix)
+
+		// get pending reward (panic on unmarshal fail)
+		amount := store.GetStoredDec(kvStore, key, sdk.ZeroDec(), "reward basis")
+
+		// add to pendingReward
+		rewardBasis = rewardBasis.Add(sdk.NewDecCoinFromDec(denom, amount))
+		return nil
+	}
+
+	store.Iterate(kvStore, ctx, prefix, iterator)
+
+	return rewardBasis
 }

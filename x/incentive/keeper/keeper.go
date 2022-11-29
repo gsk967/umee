@@ -55,7 +55,7 @@ func (k Keeper) Claim(ctx sdk.Context, addr sdk.AccAddress) (sdk.Coins, error) {
 	}
 
 	// get the sum of newly calculated and previously pending rewards
-	rewards := k.GetAllPendingRewards(ctx, addr)
+	rewards := k.GetPendingRewards(ctx, addr)
 
 	// claim all pending rewards
 	if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, incentive.ModuleName, addr, rewards); err != nil {

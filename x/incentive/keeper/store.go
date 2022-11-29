@@ -11,7 +11,7 @@ import (
 // using an sdk.Coins after clearing the addresses existing pending rewards
 func (k Keeper) SetPendingRewards(ctx sdk.Context, addr sdk.AccAddress, rewards sdk.Coins) error {
 	// clear all existing rewards
-	existingRewards := k.GetAllPendingRewards(ctx, addr)
+	existingRewards := k.GetPendingRewards(ctx, addr)
 	for _, v := range existingRewards {
 		// we only need to clear an entry if it will not be overwritten with a nonzero amount
 		if rewards.AmountOf(v.Denom).IsZero() {

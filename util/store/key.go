@@ -23,3 +23,10 @@ func DenomFromKeyWithAddress(key, prefix []byte) string {
 func DenomFromKey(key, prefix []byte) string {
 	return string(key[len(prefix) : len(key)-1])
 }
+
+// TrailingDenomFromKey extracts denom from a key which
+// ends in 0x00 | denom | 0x00
+func TrailingDenomFromKey(key, prefix []byte) string {
+	// TODO
+	return string(key[len(prefix) : len(key)-1])
+}
